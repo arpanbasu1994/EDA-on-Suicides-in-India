@@ -1,0 +1,219 @@
+/*creating database and using it*/
+
+create database suicidecasesindia;
+use suicidecasesindia;
+
+/*creating table*/
+
+create table suicides_in_india (
+State varchar(50),
+Years int(10) not null,
+Type_code varchar(50),
+Type	varchar(50),
+Gender	varchar(10),
+Age_group varchar(10),
+Total int(100) not null
+);
+
+alter table suicides_in_india
+modify column Gender varchar(10);
+
+
+/*statewise total suicide rates*/
+
+select State, sum(Total) as Total_cases
+from suicides_in_india
+group by State
+order by Total_cases desc limit 10;
+
+/*gender wise cases*/
+
+select Gender, sum(Total) as total_cases
+from suicides_in_india
+group by Gender;
+
+/* yearwise trend of suicides in india*/
+
+select Years, sum(Total)
+from suicides_in_india
+group by Years;
+
+select State, Years, sum(Total)
+from suicides_in_india
+group by State,Years;
+
+
+/*age group prone to suicide*/
+
+select Age_group, sum(Total) as cases
+from suicides_in_india
+where Age_group <>"0-100+"
+group by Age_group;
+
+
+/*What are the main causes for suicide for the most prone age group*/
+
+select Type as causes, sum(Total) as total_cases
+from suicides_in_india
+where Type_code="Causes" and Age_group = "15-29"
+group by causes
+order by total_cases desc;
+
+/*6)	What are the usual causes of suicide among females*/
+
+select Type as causes, sum(Total) as total_cases
+from suicides_in_india
+where Type_code="Causes" and Gender = "Female"
+group by causes
+order by total_cases desc;
+
+/*What are the usual causes of suicide among males*/
+
+select Type as causes, sum(Total) as total_cases
+from suicides_in_india
+where Type_code="Causes" and Gender = "Male"
+group by causes
+order by total_cases desc;
+
+/*	Which professional profile is more prone to suicide  */
+
+select Type as prof, sum(Total) as total_cases
+from suicides_in_india
+where Type_code = "Professional_Profile"
+group by prof;
+
+/*suicides due to physical abuses(rape) in different states of india for both genders*/
+
+select State, sum(Total) as cases
+from suicides_in_india
+where Type = "Physical Abuse (Rape/Incest Etc.)" and Gender = "Female"
+group by State
+order by cases desc limit 10;
+
+/*dowry dispute suicidesin different states*/
+
+select State, sum(Total),
+CASE 
+when  Gender = 'Male' Then "male suicides"
+else "null"
+END as Suicide
+from suicides_in_india
+where Type = "Dowry Dispute"
+group by  State;
+
+/*Which social status commits more suicides(Female)*/
+
+select Type as social_status, Gender, sum(Total)
+from suicides_in_india
+where Type_code="Social_Status" 
+group by  Type,Gender;
+
+/*	Which social status commits more suicides(male)*/
+
+select Type as social_status,Gender, sum(Total)
+from suicides_in_india
+where Type_code="Social_Status"
+group by Type, Gender;
+
+/*What are the most common means adopted by males*/
+
+select Type as means, sum(Total) 
+from suicides_in_india 
+where Type_code = "Means_adopted" and Gender = "Male" 
+group by means;
+
+
+/*What are the most common means adopted by females*/
+
+select Type as means, Gender, sum(Total) as cases
+from suicides_in_india 
+where Type_code = "Means_adopted" 
+group by means, Gender;
+
+
+/*gender gap in suicide rate for married individuals*/
+
+select Gender, sum(Total)
+from suicides_in_india
+where Type_code = "Social_Status" and Type="Married"
+group by Gender;
+
+
+/* State wise farmer suicides*/
+
+select State, sum(Total) as farmers
+from suicides_in_india
+where Type="Farming/Agriculture Activity"
+group by State
+order by farmers desc limit 10;
+
+/*	State wise children suicide rate*/
+
+select State, sum(Total)
+from suicides_in_india
+where Age_group = "0-14"
+group by State;
+
+/*Common causes of children suicides*/
+
+select Type as reasons, sum(Total) as count_of_children
+from suicides_in_india
+where Type_code="Causes" and Age_group = "0-14"
+group by reasons
+order by count_of_children desc limit 10;
+
+/*states having most senior citizen suicides*/
+
+select State, sum(Total)
+from suicides_in_india
+where Age_group = "60+"
+group by State;
+
+/*common causes of suicide among senior citizen*/
+
+select Type as reasons, sum(Total) as count_of_seniorcitizens
+from suicides_in_india
+where Type_code="Causes" and Age_group = "60+"
+group by reasons 
+order by count_of_seniorcitizens desc
+limit 10;
+
+
+
+
+
+
+
+
+
+select Type as means, sum(Total)
+ from suicides_in_india 
+ where Type_code = "Means_adopted" and Gender = "Male" group by means LIMIT 0, 1000;
+
+select Age_group, sum(Total)
+from suicides_in_india
+where Age_group <>"0-100+"
+group by Age_group;
+
+select State, sum(Total)
+from suicides_in_india
+where Type="Graduate"
+group by State 
+order by sum(Total) desc limit 10;
+
+select State, sum(Total) as uneducated_suicides
+from suicides_in_india
+where Type="No Education"
+group by State 
+order by sum(Total) desc limit 5;
+
+
+select State, sum(Total) as total_cases
+from suicides_in_india
+where Gender="Male" and Age_group="30-44"
+group by State
+order by total_cases desc limit 10;
+
+select State, sum(Total), row_number() over(order by sum(total) desc) RowNumber
+from suicides_in_india
+group by State;
